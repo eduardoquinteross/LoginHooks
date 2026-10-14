@@ -1,0 +1,17 @@
+import { app } from "./app";
+import { env } from "./config/env";
+import { prisma } from "./lib/prisma";
+
+const server = app.listen(env.PORT, () => {
+  console.info(`API escuchando en http://localhost:${env.PORT}`);
+});
+
+async function shutdown(): Promise<void> {
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
